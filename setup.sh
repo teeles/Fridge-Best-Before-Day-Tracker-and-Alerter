@@ -8,7 +8,7 @@
 
 #### Variables ####
 INSTALL_DIR="/opt/fridgewatch"
-REPO="https://github.com/youruser/fridgewatch.git"
+REPO="https://github.com/teeles/Fridge-Best-Before-Day-Tracker-and-Alerter.git"
 PASS=$(openssl rand -base64 15 | tr -dc 'a-zA-Z0-9' | head -c 20)
 #### Functions ####
 
