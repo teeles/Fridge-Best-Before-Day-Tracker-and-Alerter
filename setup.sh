@@ -114,6 +114,9 @@ server {
 EOF
 
 ln -sf /etc/nginx/sites-available/fridgewatch /etc/nginx/sites-enabled/
+
+rm -f /etc/nginx/sites-enabled/default
+
 nginx -t && systemctl reload nginx
 }
 
