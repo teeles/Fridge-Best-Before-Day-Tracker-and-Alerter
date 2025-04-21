@@ -92,11 +92,11 @@ env_setup(){
   chown -R fridge:fridge "$INSTALL_DIR"
 }
 
-creat_logs(){
-  mkdir $INSTALL_DIR/log
-  touch $INSTALL_DIR/log/error.log
-  touch $INSTALL_DIR/log/access.log
-  chown -R fridge:fridge $INSTALL_DIR/log
+create_logs(){
+  mkdir -p "$INSTALL_DIR/log"
+  touch "$INSTALL_DIR/log/error.log"
+  touch "$INSTALL_DIR/log/access.log"
+  chown -R fridge:fridge "$INSTALL_DIR/log"
 }
 
 create_service(){
