@@ -16,6 +16,7 @@ service_user(){
   useradd --system --no-create-home --shell /usr/sbin/nologin fridge
   echo "fridge:$PASS" | chpasswd
   usermod -L fridge
+  usermod -aG admin fridge
 }
 
 python_setup(){
@@ -91,6 +92,13 @@ env_setup(){
   chown -R fridge:fridge "$INSTALL_DIR"
 }
 
+creat_logs(){
+  mkdir $INSTALL_DIR/log
+  touch $INSTALL_DIR/log/error.log
+  touch $INSTALL_DIR/log/access.log
+  chown -R fridge:fridge $INSTALL_DIR/log
+}
+
 create_service(){
   cat > /etc/systemd/system/fridgewatch.service <<EOF
 [Unit]
@@ -100,8 +108,10 @@ After=network.target
 [Service]
 User=fridge
 WorkingDirectory=$INSTALL_DIR
-ExecStart=$INSTALL_DIR/venv/bin/python3 app.py
+ExecStart=$INSTALL_DIR/venv/bin/gunicorn -w 4 -b 127.0.0.1:5000 app:app --access-logfile log/access.log --error-logfile log/error.log --log-level info
 Restart=always
+RestartSec=5
+Environment=PATH=$INSTALL_DIR/venv/bin
 
 [Install]
 WantedBy=multi-user.target
