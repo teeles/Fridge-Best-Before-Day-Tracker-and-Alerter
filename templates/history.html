@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>History – F.B.B.D.T.A.A.</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <h1>History</h1>
+  <a href="/">← Back to Dashboard</a><br><br>
+
+  <h2>Individual Items</h2>
+  {% if items %}
+    <ul>
+    {% for item in items %}
+      <li><strong>{{ item.item }}</strong> – {{ item.best_before }} in the {{ item.location }} (added by {{ item.added_by }})</li>
+    {% endfor %}
+    </ul>
+  {% else %}
+    <p>No dead individual items yet.</p>
+  {% endif %}
+
+  <h2>Leftovers</h2>
+  {% if leftovers %}
+    <ul>
+    {% for lo in leftovers %}
+      <li><strong>Leftover</strong> – Made on {{ lo.made_on }}, best before {{ lo.best_before }} ({{ lo.location }}) added by {{ lo.added_by }}</li>
+    {% endfor %}
+    </ul>
+  {% else %}
+    <p>No dead leftovers yet.</p>
+  {% endif %}
+</body>
+</html>

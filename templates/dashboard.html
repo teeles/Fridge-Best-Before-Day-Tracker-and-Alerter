@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>F.B.B.D.T.A.A. Dashboard</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+  <header>
+    <h1>Fridge Best Before Day Tracker and Alerter</h1>
+    <nav class="button-bar">
+      <form method="POST" action="/send-email">
+  <button type="submit">Email Report</button>
+</form>
+      <a href="/add"><button type="button">New Item</button></a>
+      <a href="/leftovers"><button type="button"> Add Leftover</button></a>
+      <a href="/history"><button type="button">History</button></a>
+      <a href="/shopping-list"><button type="button"> Shopping List</button></a>
+    </nav>
+  </header>
+
+{% if future %}
+  <h2>Whats in my Fridge</h2>
+  <table class="data-table">
+    <thead>
+      <tr><th>Item</th><th>Location</th><th>Use By</th><th>Added By</th><th></th></tr>
+    </thead>
+    <tbody>
+      {% for item in future %}
+        <tr>
+          <td>{{ item.item }}</td>
+          <td>{{ item.location }}</td>
+          <td>{{ item.best_before }}</td>
+          <td>{{ item.added_by }}</td>
+          <td>
+            <form method="POST" action="/mark-dead/{{ item.id }}">
+              <button type="submit">Remove</button>
+            </form>
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endif %}
+
+
+{% if past %}
+  <h2>Fridge - Stuff you might need to bin</h2>
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>Item</th>
+        <th>Location</th>
+        <th>Use By</th>
+        <th>Added By</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in past %}
+        <tr class="{% if item.high_risk == 'yes' %}high-risk{% endif %}">
+          <td>{{ item.item }}</td>
+          <td>{{ item.location }}</td>
+          <td>{{ item.best_before }}</td>
+          <td>{{ item.added_by }}</td>
+          <td>
+            <form method="POST" action="/mark-dead/{{ item.id }}">
+              <button type="submit">Remove</button>
+            </form>
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endif %}
+
+
+ {% if today_items %}
+  <h2>Fridge - Stuff you need to use today</h2>
+  <table class="data-table">
+    <thead>
+      <tr><th>Item</th><th>Location</th><th>Use By</th><th>Added By</th><th></th></tr>
+    </thead>
+    <tbody>
+      {% for item in today_items %}
+        <tr class="{% if item.high_risk == 'yes' %}high-risk{% endif %}">
+          <td>{{ item.item }}</td>
+          <td>{{ item.location }}</td>
+          <td>{{ item.best_before }}</td>
+          <td>{{ item.added_by }}</td>
+          <td>
+            <form method="POST" action="/mark-dead/{{ item.id }}">
+              <button type="submit">Remove</button>
+            </form>
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endif %}
+
+{% if tomorrow_items %}
+  <h2>Fridge - Stuff you need to use tomorrow</h2>
+  <table class="data-table">
+    <thead>
+      <tr><th>Item</th><th>Location</th><th>Use By</th><th>Added By</th><th></th></tr>
+    </thead>
+    <tbody>
+      {% for item in tomorrow_items %}
+        <tr>
+          <td>{{ item.item }}</td>
+          <td>{{ item.location }}</td>
+          <td>{{ item.best_before }}</td>
+          <td>{{ item.added_by }}</td>
+          <td>
+            <form method="POST" action="/mark-dead/{{ item.id }}">
+              <button type="submit">Remove</button>
+            </form>
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endif %}
+
+<h2>Leftovers Already Past Best Before</h2>
+{% if lo_past %}
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>Title</th>
+        <th>Location</th>
+        <th>Made On</th>
+        <th>Use By</th>
+        <th></th>  <!-- For Mark as Dead -->
+      </tr>
+    </thead>
+    <tbody>
+      {% for lo in lo_past %}
+        <tr>
+          <td>{{ lo.title }}</td>
+          <td>{{ lo.location }}</td>
+          <td>{{ lo.made_on }}</td>
+          <td>{{ lo.best_before }}</td>
+          <td>
+            <form method="POST" action="/leftovers" style="display:inline;">
+              <input type="hidden" name="action" value="mark_dead">
+              <input type="hidden" name="lo_id" value="{{ lo.id }}">
+              <button type="submit" style="font-size: 0.8rem;">Remove</button>
+            </form>
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% else %}
+  <p>No leftovers today.</p>
+{% endif %}
+
+<h2>Left Overs You Need To Eat Today</h2>
+{% if lo_today %}
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>Title</th>
+        <th>Location</th>
+        <th>Made On</th>
+        <th>Use By</th>
+        <th></th>  <!-- For Mark as Dead -->
+      </tr>
+    </thead>
+    <tbody>
+      {% for lo in lo_today %}
+        <tr>
+          <td>{{ lo.title }}</td>
+          <td>{{ lo.location }}</td>
+          <td>{{ lo.made_on }}</td>
+          <td>{{ lo.best_before }}</td>
+          <td>
+            <form method="POST" action="/leftovers" style="display:inline;">
+              <input type="hidden" name="action" value="mark_dead">
+              <input type="hidden" name="lo_id" value="{{ lo.id }}">
+              <button type="submit" style="font-size: 0.8rem;">Remove</button>
+            </form>
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% else %}
+  <p>No leftovers today.</p>
+{% endif %}
+
+
+</body>
+</html>

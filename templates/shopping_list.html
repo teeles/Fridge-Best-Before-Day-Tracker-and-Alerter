@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Shopping List</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+  <h1>Shopping List</h1>
+  <a href="/">← Back to Dashboard</a>
+
+ <form method="POST">
+  <label>Item:</label>
+  <input type="text" name="item" required>
+
+  <label>Meal (optional):</label>
+  <input type="text" name="meal" placeholder="e.g. Tacos, Stir Fry, Misc">
+
+  <label>Added By:</label>
+  <input type="text" name="added_by" required>
+
+  <button type="submit" name="action" value="add">Add to List</button>
+</form>
+
+
+  {% if items_by_meal %}
+  <h2>Current List</h2>
+
+{% for meal, items in items_by_meal.items() %}
+  <h3>
+    {% if meal.lower() == 'misc' %}
+      Miscellaneous
+    {% else %}
+      Meal: {{ meal }}
+    {% endif %}
+  </h3>
+
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>Item</th>
+        <th>Added By</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in items %}
+        <tr>
+          <td>{{ item.item }}</td>
+          <td>{{ item.added_by }}</td>
+          <td>
+            <form method="POST" action="/shopping-list" style="display:inline;">
+              <input type="hidden" name="action" value="remove">
+              <input type="hidden" name="item_id" value="{{ item.id }}">
+              <button type="submit" title="Remove from list">🗑</button>
+            </form>
+
+            <a href="/add?item={{ item.item }}">
+              <button type="button" title="Add to Fridge">➕</button>
+            </a>
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endfor %}
+
+{% else %}
+  <p>No items on the list yet.</p>
+{% endif %}
+
+<form method="POST" action="/shopping-list">
+  <input type="hidden" name="action" value="send">
+  <button type="submit">Email List</button>
+</form>
+
+</body>
+</html>

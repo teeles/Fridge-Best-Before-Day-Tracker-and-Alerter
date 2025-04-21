@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Add Item</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+  <h1>Add Individual Item</h1>
+
+  <form method="POST">
+
+  <h2>Storage Info</h2>
+  <label for="location">Location:</label>
+  <select name="location" required>
+    <option value="fridge">Fridge</option>
+    <option value="freezer">Freezer</option>
+  </select>
+
+  <h2>Item Details</h2>
+  <label for="category">Category:</label>
+  <select id="category" name="category" onchange="updateItems()" required>
+    {% for cat in categories %}
+    <option value="{{ cat }}">{{ cat }}</option>
+    {% endfor %}
+  </select>
+
+  <label for="item">Item:</label>
+  <select id="item" name="item" required></select>
+
+  <label for="best_before">Best Before Date:</label>
+  <input type="date" name="best_before" required>
+
+  <h2>Entry Info</h2>
+  <label for="added_by">Added By:</label>
+  <input type="text" name="added_by" required>
+
+  <label for="barcode">Barcode (optional):</label>
+  <input type="text" name="barcode">
+
+  <div class="button-bar">
+    <button type="submit" name="action" value="add">Add Item</button>
+    <button type="submit" name="action" value="add_another">Add and Add Another</button>
+    <a href="/"><button type="button">Cancel</button></a>
+  </div>
+</form>
+
+
+  <script>
+    const itemsMap = {{ items_map | tojson }};
+    function updateItems() {
+      const category = document.getElementById('category').value;
+      const itemSelect = document.getElementById('item');
+      itemSelect.innerHTML = '';
+
+      itemsMap[category].forEach(item => {
+        const option = document.createElement('option');
+        option.value = item;
+        option.text = item;
+        itemSelect.add(option);
+      });
+    }
+
+    updateItems();  // Initialize dropdown
+  </script>
+</body>
+</html>

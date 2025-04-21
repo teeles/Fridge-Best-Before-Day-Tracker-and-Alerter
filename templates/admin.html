@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Admin</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <h1>FridgeWatch Admin</h1>
+  <a href="/">← Back to Dashboard</a>
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <ul>
+      {% for message in messages %}
+        <li style="color: green;">{{ message }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+{% endwith %}
+
+<h2>DB Admin</h2>
+
+<form method="POST" style="display:inline;">
+  <input type="hidden" name="action" value="cleanup">
+  <button type="submit">Cleanup Old Records</button>
+</form>
+
+<form method="POST" style="display:inline; margin-left: 1rem;">
+  <input type="hidden" name="action" value="backup">
+  <button type="submit">Backup Database</button>
+</form>
+
+<h2>Add New Category</h2>
+  <form method="POST" style="margin-bottom: 2rem;">
+    <input type="hidden" name="action" value="add_category">
+    <input type="text" name="new_category" placeholder="New category name" required>
+    <button type="submit">Add Category</button>
+  </form>
+
+<h2>Manage Categories</h2>
+  {% for category, items in categories.items() %}
+    <div style="margin-bottom: 3rem;">
+      <form method="POST" style="display:inline;">
+        <input type="hidden" name="action" value="delete_category">
+        <input type="hidden" name="category_to_delete" value="{{ category }}">
+        <strong>{{ category }}</strong>
+        <button type="submit">Delete Category</button>
+      </form>
+
+      {% if items %}
+        <table class="data-table" style="margin-top: 1rem;">
+          <thead>
+            <tr>
+              <th>Item</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in items %}
+              <tr>
+                <td>{{ item }}</td>
+                <td>
+                  <form method="POST" style="display:inline;">
+                    <input type="hidden" name="action" value="delete_item">
+                    <input type="hidden" name="delete_item_category" value="{{ category }}">
+                    <input type="hidden" name="item_to_delete" value="{{ item }}">
+                    <button type="submit">🗑</button>
+                  </form>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% else %}
+        <p style="font-style: italic;">No items yet.</p>
+      {% endif %}
+
+      <form method="POST" style="margin-top: 0.5rem;">
+        <input type="hidden" name="action" value="add_item">
+        <input type="hidden" name="item_category" value="{{ category }}">
+        <input type="text" name="new_item" placeholder="New item name" required>
+        <button type="submit">Add Item</button>
+      </form>
+    </div>
+  {% endfor %}
+</body>
+</html>

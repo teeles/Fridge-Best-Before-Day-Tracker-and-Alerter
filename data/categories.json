@@ -1,0 +1,32 @@
+{
+  "Meat": [
+    "Ground Beef",
+    "Lamb Chops",
+    "Pork Chops",
+    "Steak"
+  ],
+  "Chicken & Poultry": [
+    "Raw Chicken Breast",
+    "Whole Chicken"
+  ],
+  "Fish & Seafood": [
+    "Fresh Salmon",
+    "Raw Shrimp",
+    "Cod Fillet"
+  ],
+  "Dairy": [
+    "Milk",
+    "Yogurt",
+    "Cream"
+  ],
+  "Cheese & Butter": [
+    "Cheddar",
+    "Brie",
+    "Butter"
+  ],
+  "Salad & Veg": [
+    "Lettuce",
+    "Broccoli",
+    "Carrots"
+  ]
+}
