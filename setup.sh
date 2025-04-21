@@ -66,14 +66,28 @@ env_setup(){
 
   git clone "$REPO" "$INSTALL_DIR"
   cd "$INSTALL_DIR"
+  
   if [ -f setup.sh ]; then
     rm setup.sh
   fi
+  
   python3 -m venv venv
   source venv/bin/activate
   pip install --upgrade pip
   pip install -r requirements.txt
-  python3 init_db.py
+  
+  DB_OUTPUT=$(python3 init_db.py 2>&1)
+  
+  echo "$DB_OUTPUT"
+
+  if echo "$DB_OUTPUT" | grep -qi "WARNING"; then
+    echo "WARNING: There were issues initializing the database."
+    echo "Check output above or manually review init_db.py"
+    exit 1
+  else
+    echo "Database initialization successful!"
+  fi 
+
   chown -R fridge:fridge "$INSTALL_DIR"
 }
 
