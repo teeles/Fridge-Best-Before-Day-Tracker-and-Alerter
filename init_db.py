@@ -28,6 +28,7 @@ CREATE TABLE IF NOT EXISTS leftovers (
     location TEXT NOT NULL,
     title TEXT NOT NULL,
     made_on DATETIME NOT NULL,
+    added_on DATETIME DEFAULT CURRENT_TIMESTAMP
     best_before DATE NOT NULL,
     added_by TEXT NOT NULL
 )
