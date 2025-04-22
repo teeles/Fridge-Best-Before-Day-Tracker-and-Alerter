@@ -68,6 +68,35 @@ else:
     print("Failed to create 'shopping_list'")
     errors.append('shopping_list')
 
+c.execute('''
+CREATE TABLE IF NOT EXISTS smtp_settings (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    smtp_server TEXT,
+    smtp_port TEXT,
+    user TEXT,
+    pass TEXT,
+    added_on DATETIME DEFAULT CURRENT_TIMESTAMP
+)
+''')
+if check_table_exists('smtp_settings'):
+    print("Created 'smtp_settings'")
+else:
+    print("Failed to create 'smtp_settings'")
+    errors.append('smtp_settings')
+
+c.execute('''
+CREATE TABLE IF NOT EXISTS smtp_recipients (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    email TEXT NOT NULL,
+    added_on DATETIME DEFAULT CURRENT_TIMESTAMP
+)
+''')
+if check_table_exists('smtp_recipients'):
+    print("Created 'smtp_recipients'")
+else:
+    print("Failed to create 'smtp_recipients'")
+    errors.append('smtp_recipients')
+
 conn.commit()
 conn.close()
 

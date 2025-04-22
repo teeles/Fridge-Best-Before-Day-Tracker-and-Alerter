@@ -250,11 +250,46 @@ def send_email_now():
 def admin():
     categories = load_categories()
 
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    c = conn.cursor()
+
+    # --- Handle form actions ---
     if request.method == 'POST':
         action = request.form.get('action')
 
-        # Maintenance Actions
-        if action == 'cleanup':
+        # SMTP Settings Update
+        if action == 'update_smtp':
+            smtp_server = request.form['smtp_server']
+            smtp_port = request.form['smtp_port']
+            user = request.form['user']
+            password = request.form['pass']
+
+            c.execute("DELETE FROM smtp_settings")  # Wipe existing settings
+            c.execute("""
+                INSERT INTO smtp_settings (smtp_server, smtp_port, user, pass)
+                VALUES (?, ?, ?, ?)
+            """, (smtp_server, smtp_port, user, password))
+            conn.commit()
+            flash("SMTP settings updated successfully.")
+
+        # Add a recipient
+        elif action == 'add_recipient':
+            email = request.form.get('new_email', '').strip()
+            if email:
+                c.execute("INSERT INTO smtp_recipients (email) VALUES (?)", (email,))
+                conn.commit()
+                flash(f"Recipient '{email}' added.")
+
+        # Delete a recipient
+        elif action == 'delete_recipient':
+            email_id = request.form['recipient_id']
+            c.execute("DELETE FROM smtp_recipients WHERE id = ?", (email_id,))
+            conn.commit()
+            flash("Recipient removed.")
+
+        # Maintenance
+        elif action == 'cleanup':
             subprocess.run(['python3', 'cleanup_db.py', '--cleanup'])
             flash("Cleanup complete.")
         elif action == 'backup':
@@ -268,6 +303,7 @@ def admin():
             else:
                 flash("Reset cancelled.")
 
+        # Category Management
         elif action == 'add_category':
             new_cat = request.form['new_category'].strip()
             if new_cat and new_cat not in categories:
@@ -288,9 +324,20 @@ def admin():
                 categories[cat].remove(item)
 
         save_categories(categories)
+        conn.close()
         return redirect('/admin')
 
-    return render_template('admin.html', categories=categories)
+    # Query current SMTP settings
+    c.execute("SELECT * FROM smtp_settings ORDER BY added_on DESC LIMIT 1")
+    smtp_settings = c.fetchone()
+
+    # Query recipients
+    c.execute("SELECT * FROM smtp_recipients ORDER BY email ASC")
+    recipients = c.fetchall()
+
+    conn.close()
+
+    return render_template('admin.html', categories=categories, smtp=smtp_settings, recipients=recipients)
 
 
 if __name__ == '__main__':

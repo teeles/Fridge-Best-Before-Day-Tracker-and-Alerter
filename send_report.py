@@ -5,23 +5,46 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 import os
 import argparse
+import sys
 
 DB_PATH = os.path.join(os.path.dirname(__file__), 'db', 'fbbdtaa.db')
 
 # SMTP function
 def smtp_send(subject, html_body):
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    c = conn.cursor()
+
+    c.execute("SELECT * FROM smtp_settings ORDER BY added_on DESC LIMIT 1")
+    settings = c.fetchone()
+
+    c.execute("SELECT email FROM smtp_recipients")
+    recipients = [row['email'] for row in c.fetchall()]
+
+    conn.close()
+
+    if not settings:
+        raise Exception("SMTP settings not found.")
+
+    if not recipients:
+        raise Exception("No recipients found.")
+
     msg = MIMEMultipart('alternative')
     msg['Subject'] = subject
     msg['From'] = "The Fridge"
-    msg['To'] = "tom@tlemail.me, laura@tlemail.me"  # comma-separated if needed
+    msg['To'] = ", ".join(recipients)
 
     part = MIMEText(html_body, 'html')
     msg.attach(part)
 
-    with smtplib.SMTP('smtp.gmail.com', 587) as server:
-        server.starttls()
-        server.login('tomeeles123@gmail.com', 'nqzs cyuz kmwe rrtw')
-        server.send_message(msg)
+    try:
+        with smtplib.SMTP(settings['smtp_server'], int(settings['smtp_port'])) as server:
+            server.starttls()
+            server.login(settings['user'], settings['pass'])
+            server.send_message(msg)
+        return True
+    except Exception as e:
+        raise Exception(f"Failed to send email: {e}")
 
 # Email shopping list function
 def share_shopping_lists(items):
@@ -88,8 +111,9 @@ def weekly_report():
     items, leftovers = fetch_data()
     past, today, tomorrow, future = items
     lo_past, lo_today, lo_tomorrow, _ = leftovers  # ignore future leftovers
+    now = datetime.now().strftime('%d-%m-%y %H:%M')
 
-    html = "<h2>Fridge Report $today</h2>"
+    html = f"<h2>Fridge Report: {now}</h2>"
     html += format_section("What's In My Fridge (Still Fresh)", future)
     html += format_section("Stuff you might need to bin", past)
     html += format_section("Stuff you need to use today", today)
