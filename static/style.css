@@ -115,3 +115,41 @@ button:hover {
   padding: 0.25rem 0.5rem;
   font-size: 0.75rem;
 }
+
+.collapsible {
+  background-color: #007bff;
+  color: white;
+  cursor: pointer;
+  padding: 12px;
+  width: 100%;
+  border: none;
+  text-align: left;
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+  border-radius: 4px;
+}
+
+.collapsible:hover {
+  background-color: #0056b3;
+}
+
+.content {
+  display: none;
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+}
+
+.content .collapsible {
+  margin-left: 1rem;
+}
+
+.content .content {
+  border-left: 2px solid #ccc;
+  padding-left: 1rem;
+  margin-left: 0.5rem;
+}
+
+.content .collapsible + .content {
+  margin-top: 0.5rem;
+}
+

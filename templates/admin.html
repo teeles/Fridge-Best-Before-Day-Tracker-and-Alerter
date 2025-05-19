@@ -17,90 +17,95 @@
   {% endif %}
 {% endwith %}
 
-<h2>SMTP Settings</h2>
-<form method="POST">
-  <input type="hidden" name="action" value="update_smtp">
-  <label>SMTP Server:</label><input type="text" name="smtp_server" required><br>
-  <label>SMTP Port:</label><input type="text" name="smtp_port" required><br>
-  <label>Username:</label><input type="text" name="user" required><br>
-  <label>Password:</label><input type="password" name="pass" required><br>
-  
-  <button type="submit">Save SMTP Settings</button>
-</form>
+<button class="collapsible">SMTP Settings</button>
+<div class="content">
+  <form method="POST">
+    <input type="hidden" name="action" value="update_smtp">
+    <label>SMTP Server:</label><input type="text" name="smtp_server" required><br>
+    <label>SMTP Port:</label><input type="text" name="smtp_port" required><br>
+    <label>Username:</label><input type="text" name="user" required><br>
+    <label>Password:</label><input type="password" name="pass" required><br>
+    <button type="submit">Save SMTP Settings</button>
+  </form>
 
-{% if smtp %}
-<h3>Current SMTP Settings</h3>
-<table class="data-table">
-  <tr>
-    <th>SMTP Server & Port</th>
-    <th>Username</th>
-    <th>Date Added</th>
-  </tr>
-  <tr>
-    <td>{{ smtp.smtp_server }}:{{ smtp.smtp_port }}</td>
-    <td>{{ smtp.user }}</td>
-    <td>{{ smtp.added_on }}</td>
-  </tr>
-</table>
-{% endif %}
-
-<h2>Email Recipients</h2>
-
-{% if recipients %}
+  {% if smtp %}
+  <h3>Current SMTP Settings</h3>
   <table class="data-table">
-    <thead>
-      <tr>
-        <th>Email</th>
-        <th>Action</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for r in recipients %}
-        <tr>
-          <td>{{ r.email }}</td>
-          <td>
-            <form method="POST" style="display:inline;">
-              <input type="hidden" name="action" value="delete_recipient">
-              <input type="hidden" name="recipient_id" value="{{ r.id }}">
-              <button type="submit">🗑</button>
-            </form>
-          </td>
-        </tr>
-      {% endfor %}
-    </tbody>
+    <tr>
+      <th>SMTP Server & Port</th>
+      <th>Username</th>
+      <th>Date Added</th>
+    </tr>
+    <tr>
+      <td>{{ smtp.smtp_server }}:{{ smtp.smtp_port }}</td>
+      <td>{{ smtp.user }}</td>
+      <td>{{ smtp.added_on }}</td>
+    </tr>
   </table>
-{% else %}
-  <p style="font-style: italic;">No recipients yet.</p>
-{% endif %}
+  {% endif %}
 
-<form method="POST" style="margin-top: 1rem;">
-  <input type="hidden" name="action" value="add_recipient">
-  <input type="email" name="new_email" placeholder="New email address" required>
-  <button type="submit">Add Recipient</button>
-</form>
+  <h3>Email Recipients</h3>
+  {% if recipients %}
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Email</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in recipients %}
+          <tr>
+            <td>{{ r.email }}</td>
+            <td>
+              <form method="POST" style="display:inline;">
+                <input type="hidden" name="action" value="delete_recipient">
+                <input type="hidden" name="recipient_id" value="{{ r.id }}">
+                <button type="submit">🗑</button>
+              </form>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p style="font-style: italic;">No recipients yet.</p>
+  {% endif %}
 
-<h2>DB Admin</h2>
+  <form method="POST" style="margin-top: 1rem;">
+    <input type="hidden" name="action" value="add_recipient">
+    <input type="email" name="new_email" placeholder="New email address" required>
+    <button type="submit">Add Recipient</button>
+  </form>
+</div>
 
-<form method="POST" style="display:inline;">
-  <input type="hidden" name="action" value="cleanup">
-  <button type="submit">Cleanup Old Records</button>
-</form>
+<button class="collapsible">Database Maintenance</button>
+<div class="content">
+  <form method="POST" style="display:inline;">
+    <input type="hidden" name="action" value="cleanup">
+    <button type="submit">Cleanup Old Records</button>
+  </form>
 
-<form method="POST" style="display:inline; margin-left: 1rem;">
-  <input type="hidden" name="action" value="backup">
-  <button type="submit">Backup Database</button>
-</form>
+  <form method="POST" style="display:inline; margin-left: 1rem;">
+    <input type="hidden" name="action" value="backup">
+    <button type="submit">Backup Database</button>
+  </form>
+</div>
 
-<h2>Add New Category</h2>
+<button class="collapsible">Add New Category</button>
+<div class="content">
   <form method="POST" style="margin-bottom: 2rem;">
     <input type="hidden" name="action" value="add_category">
     <input type="text" name="new_category" placeholder="New category name" required>
-    <button type="submit">Add Category</button>
+    <button type="submit">Add</button>
   </form>
+</div>
 
-<h2>Manage Categories</h2>
+<button class="collapsible">Manage Categories</button>
+<div class="content">
   {% for category, items in categories.items() %}
-    <div style="margin-bottom: 3rem;">
+    <button class="collapsible" style="margin-top: 1rem;">{{ category }}</button>
+    <div class="content">
       <form method="POST" style="display:inline;">
         <input type="hidden" name="action" value="delete_category">
         <input type="hidden" name="category_to_delete" value="{{ category }}">
@@ -144,5 +149,19 @@
       </form>
     </div>
   {% endfor %}
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const coll = document.getElementsByClassName("collapsible");
+    for (let i = 0; i < coll.length; i++) {
+      coll[i].addEventListener("click", function () {
+        this.classList.toggle("active");
+        const content = this.nextElementSibling;
+        content.style.display = content.style.display === "block" ? "none" : "block";
+      });
+    }
+  });
+</script>
 </body>
 </html>

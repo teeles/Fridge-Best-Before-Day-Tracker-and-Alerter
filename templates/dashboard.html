@@ -20,29 +20,40 @@
   </header>
 
 {% if future %}
-  <h2>Whats in my Fridge</h2>
-  <table class="data-table">
-    <thead>
-      <tr><th>Item</th><th>Location</th><th>Use By</th><th>Added By</th><th></th></tr>
-    </thead>
-    <tbody>
-      {% for item in future %}
-        <tr>
-          <td>{{ item.item }}</td>
-          <td>{{ item.location }}</td>
-          <td>{{ item.best_before }}</td>
-          <td>{{ item.added_by }}</td>
-          <td>
-            <form method="POST" action="/mark-dead/{{ item.id }}">
-              <button type="submit">Remove</button>
-            </form>
-          </td>
-        </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-{% endif %}
+  <h2>What's in My Fridge/Freezer</h2>
 
+  {% for category, items in future.items() %}
+    <button class="collapsible">{{ category }}</button>
+    <div class="content">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Item</th>
+            <th>Best Before</th>
+            <th>Location</th>
+            <th>Added By</th>
+            <th></th>  <!-- for Mark as Dead -->
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in items %}
+            <tr>
+              <td>{{ item.item }}</td>
+              <td>{{ item.best_before }}</td>
+              <td>{{ item.location }}</td>
+              <td>{{ item.added_by }}</td>
+              <td>
+                <form method="POST" action="/mark-dead/{{ item.id }}" style="display:inline;">
+                  <button type="submit" style="font-size: 0.8rem;">🗑</button>
+                </form>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% endfor %}
+{% endif %}
 
 {% if past %}
   <h2>Fridge - Stuff you might need to bin</h2>
@@ -191,6 +202,18 @@
   <p>No leftovers today.</p>
 {% endif %}
 
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const coll = document.getElementsByClassName("collapsible");
+    for (let i = 0; i < coll.length; i++) {
+      coll[i].addEventListener("click", function () {
+        this.classList.toggle("active");
+        const content = this.nextElementSibling;
+        content.style.display = content.style.display === "block" ? "none" : "block";
+      });
+    }
+  });
+</script>
 
 </body>
 </html>

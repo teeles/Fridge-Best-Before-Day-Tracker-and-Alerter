@@ -133,9 +133,15 @@ def add_item():
 
     # This part only runs on GET
     CATEGORY_ITEMS = load_categories()
+    sorted_categories = sorted(CATEGORY_ITEMS.keys())
+    sorted_items_map = {
+        category: sorted(CATEGORY_ITEMS[category])
+        for category in sorted_categories
+    }
+
     return render_template('add_item.html',
-                           categories=list(CATEGORY_ITEMS.keys()),
-                           items_map=CATEGORY_ITEMS)
+                           categories=sorted_categories,
+                           items_map=sorted_items_map)
 
 @app.route('/mark-dead/<int:item_id>', methods=['POST'])
 def mark_dead(item_id):
