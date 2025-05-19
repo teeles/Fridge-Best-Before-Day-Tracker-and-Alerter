@@ -86,21 +86,29 @@ def save_categories(data):
 # ----------------------
 # Routes
 # ----------------------
+from collections import defaultdict
+
 @app.route('/')
 def index():
     past, today_items, tomorrow_items, future = query_individual_items()
     lo_past, lo_today, lo_tomorrow, lo_future = query_leftovers()
-    return render_template('dashboard.html',
-                           past=past,
-                           today_items=today_items,
-                           tomorrow_items=tomorrow_items,
-                           future=future,
-                           lo_past=lo_past,
-                           lo_today=lo_today,
-                           lo_tomorrow=lo_tomorrow,
-                           lo_future=lo_future)
 
-CATEGORY_ITEMS = load_categories()
+    # Build a dict of categories → items
+    future_by_cat = defaultdict(list)
+    for item in future:
+        future_by_cat[item['category']].append(item)
+
+    return render_template(
+        'dashboard.html',
+        past=past,
+        today_items=today_items,
+        tomorrow_items=tomorrow_items,
+        future=future_by_cat,       # now a dict!
+        lo_past=lo_past,
+        lo_today=lo_today,
+        lo_tomorrow=lo_tomorrow,
+        lo_future=lo_future
+    )
 
 @app.route('/add', methods=['GET', 'POST'])
 def add_item():

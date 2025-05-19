@@ -15,6 +15,18 @@ localversion=$( [[ -f "$APP_DIR/version.txt" ]] && head -n 1 "$APP_DIR/version.t
 
 ##### FUNCTIONS #####
 
+function cleanup() {
+    local upgrade_dir="$APP_DIR/upgrades"
+
+    if [[ -d "$upgrade_dir" ]]; then
+        echo "🧹 Cleaning up all files and folders inside: $upgrade_dir"
+        rm -rf "$upgrade_dir"/* "$upgrade_dir"/.* 2>/dev/null || true
+        echo "Cleanup complete."
+    else
+        echo "No upgrades directory found to clean."
+    fi
+}
+
 function version_compare () {
     local IFS=.
     local i ver1=($1) ver2=($2)
@@ -102,6 +114,8 @@ function upgrade () {
 
 }
 
+############# SCRIPT ###############
+
 if [[ "$(id -u)" -ne 0 ]]; then
   echo "Please run the script using the 'sudo' command"
   exit 1
@@ -115,6 +129,8 @@ if ! command -v unzip &>/dev/null; then
         exit 1
     }
 fi
+
+cleanup
 
 if version_compare "$localversion" "$versionFromGit"; then
     echo "This script is the latest V:$localversion"
@@ -146,4 +162,3 @@ echo "re-starting Fridgewatch"
 systemctl start fridgewatch
 
 echo "Thats the update completed"
-
